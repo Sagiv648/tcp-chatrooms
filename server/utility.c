@@ -9,7 +9,7 @@ char** readFromFile(int*len){
 
     FILE* info;
     char infoBuffer[21];
-    info = fopen("info.env", "r");
+    info = fopen("../info.env", "r");
     fread(infoBuffer,sizeof(infoBuffer), sizeof(infoBuffer),info);
     fclose(info);
     int i;
