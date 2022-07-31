@@ -21,19 +21,23 @@ char** readFromFile(int*len){
         }
     }
    char ** buffer = (char**)malloc(sizeof(char*)*size);
-   
+
+
    int k = 0;
    for(i = 0; infoBuffer[i] ;i++ ){
+
         if(infoBuffer[i] == '='){
+
             i++;
             size = 1;
             char* local = NULL;
             *(buffer+k) = malloc(sizeof(char));
 
             for(;infoBuffer[i] && infoBuffer[i] != '\n';i++){
+
                 *(*(buffer+k)+(size-1)) = infoBuffer[i];
 
-                local = realloc(*(buffer+k), ++size);
+                local = realloc(*(buffer+k), ++size*sizeof(char));
                 if(!local){
                     perror("Not enough memory");
                     exit(0);
@@ -44,11 +48,13 @@ char** readFromFile(int*len){
                 }
             }
             *(*(buffer+k)+(size-1)) = 0;
+            
             k++;
             
         }
     }
     *len =k;
+    
     return buffer;
 }
 
@@ -61,7 +67,8 @@ void setServerAddr(struct sockaddr_in* addr){
     
     addr->sin_family = AF_INET;
     addr->sin_addr.s_addr = inet_addr(buffer[0]);
-    addr->sin_port = atoi(buffer[1]);
+    addr->sin_port = htons(atoi(buffer[1]));
+    free(buffer);
     
 }
 
@@ -75,6 +82,8 @@ uint8_t* getipaddr(uint32_t networkedIP, uint32_t* len){
     for(i = 0; i < 4; i++){
         output[i] &= hostIp;
         hostIp >>= 8;
+        
     }
     return output;
 }
+

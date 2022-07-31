@@ -4,7 +4,7 @@ default:
 	
 
 tcpserver:
-	gcc -pthread server/tcpServer.c -pthread server/utility.c -o server/tcpServer;
+	gcc -pthread server/tcpServer.c -pthread server/utility.c -pthread server/structures.c -o server/tcpServer;
 tcpclient:
 	gcc -pthread client/tcpClients.c -o client/tcpClients
 
