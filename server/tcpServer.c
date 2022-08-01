@@ -30,7 +30,7 @@ void* routine(void*args){
         if(len > 0){
             buf[len] = 0;
             printf("client sent -> %s\n", buf);
-            break;
+            
         }
             
         
@@ -72,7 +72,8 @@ int main(int argc, char** argv){
     while(1){
 
         cl.socketDescriptor = accept(serverSocketDesc,(struct sockaddr*)&clientAddr,&clientAddrLen);
-        char buf[30];
+        if(cl.socketDescriptor){
+            char buf[30];
         int len = read(cl.socketDescriptor, buf, sizeof(buf));
         if(len < sizeof(buf)){
             buf[len] = 0;
@@ -100,6 +101,8 @@ int main(int argc, char** argv){
         else{
             chatroomAdd(&rooms[cl.roomNumber-1],cl);
         }
+        }
+        
         
 
     }
