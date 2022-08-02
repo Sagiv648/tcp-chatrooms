@@ -1,5 +1,5 @@
 default:
-	gcc -pthread server/tcpServer.c -pthread server/utility.c -o server/tcpServer;
+	gcc -pthread server/tcpServer.c -pthread server/utility.c -pthread server/structures.c -o server/tcpServer;
 	gcc -pthread client/tcpClients.c -pthread client/client_det.c -o client/tcpClients
 	
 

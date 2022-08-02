@@ -18,26 +18,40 @@ void* routine(void*args){
 //1. a function to iterate over all open sockets and retrieve the buffers sent.
 //2. a function to iterate over all open sockets and broadcast the buffers to them.
 
+//3. a function to fully read a read buffer
 
     chat_room* room = (chat_room*)args;
-
-    while(1){
-        //debugging purposes
-        char buf[20];
-        int len = read(room->client[0]->socketDescriptor, buf, 20);
-        //printf("details are: name - %s, room num - %d, descriptor - %d\n", room->client[0].Name, room->client[0].roomNumber, room->client[0].socketDescriptor);
-        //if(len < sizeof(buf)) buf[len-1] = 0;
-        if(len > 0){
+    char q[] = "/quit";
+    printf("socket desc %d from room(thread) number %d\n", room->clientList.clients[0].socketDescriptor, room->room_num);
+    printf("client name: %s, client's descriptor: %d\n", room->clientList.clients[0].Name, room->clientList.clients[0].socketDescriptor);
+    while(room->clientsNum > 0){
+       
+        char buf[BUF_LEN];
+        room->readBuffer(room->clientList.clients[0],buf);
+        //readBuffer(&room->clientList.clients[0],buf);
+        printf("after buf is %s\n", buf);
+        break;
+        int len = read(room->clientList.clients[0].socketDescriptor, buf, BUF_LEN);
+        if(len < sizeof(buf) && len > 0){
             buf[len] = 0;
-            printf("client sent -> %s\n", buf);
-            
+            if(strcmp((const char*)buf, "/quit\0") == 0){
+                printf("QUIT: entered quit\n");
+                break;
+            }
+            printf("name -> %s, descriptor -> %d\n",room->clientList.clients[1].Name,room->clientList.clients[1].socketDescriptor);
+            write(room->clientList.clients[1].socketDescriptor, buf, strlen(buf));
+            //printf("%s: %s", room->clientList.clients[0].Name, buf);
+            len = 0;
+            memset(buf,0,BUF_LEN);
         }
+        
+        
             
         
     }
 
     pthread_mutex_lock (&room->roomMtx);
-    free(room->client);
+    //free(room->client);
     room->isActive = 0;
     room->clientsNum = 0;
     pthread_mutex_unlock(&room->roomMtx);
@@ -56,6 +70,7 @@ int main(int argc, char** argv){
         perror("Failed to create a socket.\n");
         exit(1);
     }
+
     setServerAddr(&serverAddr);
     
     if(bind(serverSocketDesc,(struct sockaddr*)&serverAddr, sizeof(serverAddr)) != 0 ||
@@ -72,36 +87,34 @@ int main(int argc, char** argv){
     while(1){
 
         cl.socketDescriptor = accept(serverSocketDesc,(struct sockaddr*)&clientAddr,&clientAddrLen);
-        if(cl.socketDescriptor){
-            char buf[30];
-        int len = read(cl.socketDescriptor, buf, sizeof(buf));
+        printf("socket desc -> %d\n", cl.socketDescriptor);
+
+            char buf[BUF_LEN];
+            //readBuffer(&cl, buf);
+            
+        int len = read(cl.socketDescriptor, buf, BUF_LEN);
         if(len < sizeof(buf)){
             buf[len] = 0;
         }
-        //printf("buf connectionMsg -> %s\n", buf);
+        printf("buf after client connected is -> %s\n", buf);
+        
         //parsing the client's initial connection msg, specify the client's name and the room number
         char* sep = strtok(buf,":");
         cl.Name = sep;
-        //printf("reached here.\n");
-        //printf("reached here -> %s\n", cl.Name);
-        //printf("first sep -> %s\n", sep);
         sep = strtok(NULL, ":");
-        //printf("second sep -> %s\n", sep);
         cl.roomNumber = atoi(sep);
 
-        
-        //printf("user name -> %s | room number -> %d\n", cl.Name, cl.roomNumber);
-
-        
         cl.ip = getipaddr(clientAddr.sin_addr.s_addr, &cl.ipLen);
         
-        if(rooms[cl.roomNumber-1].isActive == 0){
-            chatroomInit(&rooms[cl.roomNumber-1], cl, &routine);
-        }
-        else{
-            chatroomAdd(&rooms[cl.roomNumber-1],cl);
-        }
-        }
+            if(rooms[cl.roomNumber-1].isActive == 0){
+                printf("entered the condition\n");
+                chatroomInit(&rooms[cl.roomNumber-1], cl, &routine);
+                printf("after thread initialized\n");
+            }
+            else{
+                chatroomAdd(&rooms[cl.roomNumber-1],cl);
+            }
+        
         
         
 

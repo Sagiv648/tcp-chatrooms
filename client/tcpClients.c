@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "client_det.h"
 
+
 void* recieveMsg(void* arg){
 
     client* cl = (client*)arg;
@@ -61,7 +62,11 @@ int main(int argc, char**argv){
             perror("Error occured\n");
             exit(1);
         }
+        else{
+            printf("sent -> %s\n", inputBuffer);
+        }
         memset(inputBuffer,0,sizeof(inputBuffer));
+        me.connected = 1;
 
 
         
@@ -75,9 +80,12 @@ int main(int argc, char**argv){
 
             userInput(inputBuffer);
             int num_written = write(me.socketFD, inputBuffer, strlen(inputBuffer));
+
             if(strcmp((const char*)inputBuffer, "/quit") == 0){
+
                 me.connected = 0;
                 close(me.socketFD);
+
                 break;
             }
 
