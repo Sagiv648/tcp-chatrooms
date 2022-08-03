@@ -34,7 +34,7 @@ int chatroomInit(chat_room* room, client first, roomRoutine routine){
 
     if(pthread_create(&room->thread, &attr, routine,(void*)room) != 0){
 
-        pthread_attr_destroy(&attr);
+        
         perror("error occured with thread");
         return 0;
     }

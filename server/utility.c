@@ -87,6 +87,14 @@ uint8_t* getipaddr(uint32_t networkedIP, uint32_t* len){
     return output;
 }
 
+void clientsBroadcast(chat_room* room, char* message){
+    int i;
+    for(i = 0; i < room->clientsNum; i++){
+        write(room->clientList.clients[i].socketDescriptor, message, strlen(message));
+    }
+}
+
+
 void readBuffer(client cl,char* incomingBuffer){
 
     int len = 0;

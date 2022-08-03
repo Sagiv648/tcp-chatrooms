@@ -1,7 +1,7 @@
 #ifndef _CLIENT_DET_H_
 #define _CLIENT_DET_H_
 
-#define BUF_LEN 50
+#define BUF_LEN 51
 
 typedef struct client{
     int socketFD;

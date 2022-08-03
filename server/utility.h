@@ -15,5 +15,6 @@ uint8_t* getipaddr(uint32_t networkedIP, uint32_t* len);
 
 void readBuffer(client cl,char* incomingBuffer);
 
+void clientsBroadcast(chat_room* room, char* message);
 
 #endif
