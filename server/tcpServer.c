@@ -24,7 +24,7 @@ void* routine(void*args){
     while(1){
         //debugging purposes
         char buf[20];
-        int len = read(room->client[0]->socketDescriptor, buf, 20);
+        int len = read(room->client[0]->socketDescriptor, buf, 50);
         //printf("details are: name - %s, room num - %d, descriptor - %d\n", room->client[0].Name, room->client[0].roomNumber, room->client[0].socketDescriptor);
         //if(len < sizeof(buf)) buf[len-1] = 0;
         if(len > 0){
