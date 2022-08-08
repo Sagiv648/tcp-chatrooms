@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "client_det.h"
 
+
 void* recieveMsg(void* arg){
 
     client* cl = (client*)arg;
@@ -28,7 +29,11 @@ char* getRoom();
 
 void getUserName(char* input);
 
+char* writeBuffer();
+
 int main(int argc, char**argv){
+
+    
 
     client me;
 
@@ -61,7 +66,11 @@ int main(int argc, char**argv){
             perror("Error occured\n");
             exit(1);
         }
+        else{
+            printf("sent -> %s\n", inputBuffer);
+        }
         memset(inputBuffer,0,sizeof(inputBuffer));
+        me.connected = 1;
 
 
         
@@ -75,9 +84,12 @@ int main(int argc, char**argv){
 
             userInput(inputBuffer);
             int num_written = write(me.socketFD, inputBuffer, strlen(inputBuffer));
+
             if(strcmp((const char*)inputBuffer, "/quit") == 0){
+
                 me.connected = 0;
                 close(me.socketFD);
+
                 break;
             }
 
@@ -138,4 +150,47 @@ void getUserName(char* input){
     printf("Enter your username:");
     fgets(input, 20, stdin);
     input[strlen(input)-1] = 0;
+    
+}
+
+char* writeBuffer(){
+    
+    int len = 1;
+    char* buf = (char*)malloc(sizeof(char)*len);
+    int ch;
+
+    // if(fgets(buf, len, stdin) != NULL){
+        
+    //     buf[strlen(buf)-1] = 0;
+    //     return buf;
+    // }
+
+
+    while( (ch = getchar()) && ch != '\n' && ch != EOF && len < BUF_LEN ){
+        
+        *(buf+(len-1)) = ch;
+        
+        char* tmp = realloc(buf, sizeof(char)*(++len));
+        if(!tmp){
+            perror("error with mem");
+            exit(1);
+        }
+        buf = tmp;
+        tmp = NULL;
+    }
+    *(buf+(len-1)) = 0;
+    //memset(stdin->_IO_write_end, 0, len);
+    
+    
+    return buf;
+    // while( len < BUF_LEN && (ch = getchar()) && ch != '\n' && ch != EOF  ){
+
+    //     buffer[len++] = (char)ch;
+    //     if(len == BUF_LEN) break;
+        
+    // }
+    // buffer[len] = 0;
+    
+    //memcpy(buffer,buf,len);
+    //strcpy(buffer,buf);
 }
