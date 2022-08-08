@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "utility.h"
 
-void initRooms(chat_room* rooms){
+void initRooms(chat_room* rooms, roomRoutine routine){
 
     int i;
     for(i = 0; i < MAX_ROOMS; i++){
@@ -14,19 +14,21 @@ void initRooms(chat_room* rooms){
         rooms[i].room_num = i+1;
         rooms[i].readBuffer = &readBuffer;
         pthread_mutex_init(&rooms[i].roomMtx, NULL);
+        pthread_cond_init(&rooms[i].roomCond_v, NULL);
+        chatroomInit(&rooms[i], routine);
     }
     
 }
 
 
-int chatroomInit(chat_room* room, client first, roomRoutine routine){
+int chatroomInit(chat_room* room, roomRoutine routine){
 
     
-    pthread_mutex_lock (&room->roomMtx);
+    //pthread_mutex_lock (&room->roomMtx);
     room->isActive = 1;
-    room->clientsNum++;
-    listAdd(&room->clientList,first);
-    pthread_mutex_unlock (&room->roomMtx);
+    //room->clientsNum = 0;
+    //listAdd(&room->clientList,first);
+    //pthread_mutex_unlock (&room->roomMtx);
     
     pthread_attr_t attr;
     pthread_attr_init(&attr);
@@ -45,10 +47,10 @@ int chatroomInit(chat_room* room, client first, roomRoutine routine){
 }
 void chatroomAdd(chat_room*room, client newClient){
 
-    pthread_mutex_lock(&room->roomMtx);
+    
     room->clientsNum++;
     listAdd(&room->clientList,newClient);
-    pthread_mutex_unlock(&room->roomMtx);
+    
 }
 
 void listInit(list* ls){

@@ -45,15 +45,16 @@ typedef struct chat_room{
     list clientList;
     int clientsNum;
     pthread_mutex_t roomMtx;
+    pthread_cond_t roomCond_v;
     void (*readBuffer)(client,char*);
 
 
 
 } chat_room;
 
-int chatroomInit(chat_room* room, client first, roomRoutine routine);
+int chatroomInit(chat_room* room, roomRoutine routine);
 void chatroomAdd(chat_room*room, client newClient);
 
-void initRooms(chat_room* rooms);
+void initRooms(chat_room* rooms, roomRoutine routine);
 
 #endif
