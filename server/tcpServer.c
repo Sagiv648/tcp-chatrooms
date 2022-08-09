@@ -14,8 +14,10 @@ void* routine(void*args){
 
     
     chat_room* room = (chat_room*)args;
-    
+    buffersNode* head = NULL;
     while(1){
+        //Potentially having a linked list of user buffers will be better
+        //The linked list will be initialized at the beginning of every iteration
         if(room->clientsNum == 0){
             pthread_mutex_lock(&(room->roomMtx));
             while(room->clientsNum < 1){
@@ -25,7 +27,10 @@ void* routine(void*args){
             }
             pthread_mutex_unlock(&(room->roomMtx));
         }
-        
+        recieve(room, head);
+        broadcast(room, head);
+        //recieveBuffers
+        //broadcastBuffers
         
 
         
@@ -65,7 +70,7 @@ int main(int argc, char** argv){
 
         cl.socketDescriptor = accept(serverSocketDesc,(struct sockaddr*)&clientAddr,&clientAddrLen);
         char buf[BUF_LEN];
-        int len = read(cl.socketDescriptor, buf, BUF_LEN);
+        int len = read(cl.socketDescriptor, buf, BUF_LEN-1);
         if(len < sizeof(buf)){
             buf[len] = 0;
         }
@@ -83,20 +88,7 @@ int main(int argc, char** argv){
         chatroomAdd(&(rooms[cl.roomNumber-1]),cl);
         pthread_mutex_unlock(&(rooms[cl.roomNumber-1].roomMtx));
         pthread_cond_signal(&(rooms[cl.roomNumber-1].roomCond_v));
-        
-        
-        
-
-            // if(rooms[cl.roomNumber-1].isActive == 0){
-            //     //printf("entered the condition\n");
-            //     chatroomInit(&rooms[cl.roomNumber-1], cl, &routine);
-            //     //printf("after thread initialized\n");
-            // }
-            // else{
-            //     //printf("entered here\n");
-            //     chatroomAdd(&rooms[cl.roomNumber-1],cl);
-            // }
-            memset(buf,0,BUF_LEN);
+        memset(buf,0,BUF_LEN);
         
         
         

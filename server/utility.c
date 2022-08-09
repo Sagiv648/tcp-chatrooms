@@ -87,20 +87,12 @@ uint8_t* getipaddr(uint32_t networkedIP, uint32_t* len){
     return output;
 }
 
-void clientsBroadcast(chat_room* room, char* message){
-    int i;
-    for(i = 0; i < room->clientsNum; i++){
-        write(room->clientList.clients[i].socketDescriptor, message, strlen(message));
-    }
-}
-
-
 void readBuffer(client cl,char* incomingBuffer){
 
     int len = 0;
     int bufLen = 0;
     printf("socket desc %d->",cl.socketDescriptor);
-    len = read(cl.socketDescriptor, incomingBuffer, BUF_LEN);
+    len = read(cl.socketDescriptor, incomingBuffer, BUF_LEN-1);
     //printf("%s - %d", cl->Name, cl->socketDescriptor);
     // while((len = read(cl.socketDescriptor, incomingBuffer, BUF_LEN)) ){
     //     //printf("buffer now -> %s\n", incomingBuffer);
@@ -111,3 +103,15 @@ void readBuffer(client cl,char* incomingBuffer){
 
 }
 
+void recieve(chat_room* room,buffersNode* head){
+    int i;
+    for(i = 0; i < room->clientsNum; i++){
+        enqueBuffer(head, room->clientList.clients[i].socketDescriptor);
+    }
+}
+void broadcast(chat_room* room, buffersNode* head){
+    int i;
+    for(i = 0; i < room->clientsNum; i++){
+        dequeBuffer(head, &(room->clientList));
+    }
+}

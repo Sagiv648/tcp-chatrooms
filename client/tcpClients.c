@@ -46,7 +46,7 @@ int main(int argc, char**argv){
     server.sin_port = htons(2000);
     server.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    char inputBuffer[50];
+    char inputBuffer[51];
     getUserName(inputBuffer);
     char* room = getRoom();
     
@@ -111,7 +111,8 @@ void userInput(char* inputBuffer){
 
     printf("$ ");
 
-    fgets(inputBuffer, sizeof(inputBuffer), stdin);
+    fgets(inputBuffer, sizeof(inputBuffer)-1, stdin);
+    printf("\n");
     
 }
 char* getRoom(){
@@ -120,7 +121,7 @@ char* getRoom(){
     char* buf = malloc(5*sizeof(char));
 
     while(!isCorrect){
-        printf("Enter the chat room number: (1 - 200)");
+        printf("Enter the chat room number: (1 - 2)");
         fgets(buf,5,stdin);
         buf[strlen(buf)-1] = 0;
         int i;

@@ -6,9 +6,11 @@
 #include <pthread.h>
 
 
-#define BUF_LEN 50
+#define BUF_LEN 51
 
-#define MAX_ROOMS 200
+#define MAX_ROOMS 2
+//Will be max 2 rooms(threads) for the debugging and test sessions
+//and so the VB will not explode
 
 
 typedef struct client{
@@ -32,9 +34,17 @@ void listInit(list* ls);
 void listAdd(list* ls ,client cl);
 void listRemove(list* ls, client* cl);
 
+typedef struct clientBuffersNode{
 
+    char clBuffer[BUF_LEN];
+    int socketDescriptor;
+    int bufSz;
+    struct clientBuffersNode* next;
 
+} buffersNode;
 
+void enqueBuffer(buffersNode* head, int descriptor);
+void dequeBuffer(buffersNode* head, list* clList);
 
 typedef void*(*roomRoutine)(void* args);
 
