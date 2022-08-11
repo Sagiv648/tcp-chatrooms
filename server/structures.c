@@ -107,20 +107,20 @@ void listRemove(list* ls, client* cl){
 
 }
 
-void enqueBuffer(buffersNode* head, int descriptor){
+void enqueBuffer(buffersNode** head, int descriptor){
 
     int len;
-    if(!head){
-        head = malloc(sizeof(buffersNode));
-        head->next = NULL;
-        len = read(descriptor, head->clBuffer, BUF_LEN);
-        head->clBuffer[len] = 0;
-        head->socketDescriptor = descriptor;
-        head->bufSz = len+1;
+    if(!(*head)){
+        *head = malloc(sizeof(buffersNode));
+        (*head)->next = NULL;
+        len = read(descriptor, (*head)->clBuffer, BUF_LEN);
+        (*head)->clBuffer[len] = 0;
+        (*head)->socketDescriptor = descriptor;
+        (*head)->bufSz = len+1;
         return;
         
     }
-    buffersNode* tmp = head;
+    buffersNode* tmp = *head;
     for(;tmp->next != NULL;tmp = tmp->next);
     tmp->next = malloc(sizeof(buffersNode));
     tmp->next = NULL;
@@ -129,16 +129,16 @@ void enqueBuffer(buffersNode* head, int descriptor){
     tmp->socketDescriptor = descriptor;
     
 }
-void dequeBuffer(buffersNode* head, list* clList){
+void dequeBuffer(buffersNode** head, list* clList){
     int i;
     for(i = 0; i < clList->length; i++){
-        if(clList->clients[i].socketDescriptor == head->socketDescriptor){
+        if(clList->clients[i].socketDescriptor == (*head)->socketDescriptor){
             continue;
         }
-        write(clList->clients[i].socketDescriptor, head->clBuffer,head->bufSz);
+        write(clList->clients[i].socketDescriptor, (*head)->clBuffer,(*head)->bufSz);
 
     }
-    buffersNode* tmp = head->next;
-    free(head);
-    head = tmp;
+    buffersNode* tmp = (*head)->next;
+    free(*head);
+    *head = tmp;
 }

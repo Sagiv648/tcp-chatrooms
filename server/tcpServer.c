@@ -27,8 +27,8 @@ void* routine(void*args){
             }
             pthread_mutex_unlock(&(room->roomMtx));
         }
-        recieve(room, head);
-        broadcast(room, head);
+        recieve(room, &head);
+        broadcast(room, &head);
         //recieveBuffers
         //broadcastBuffers
         

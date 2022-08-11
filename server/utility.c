@@ -103,13 +103,13 @@ void readBuffer(client cl,char* incomingBuffer){
 
 }
 
-void recieve(chat_room* room,buffersNode* head){
+void recieve(chat_room* room,buffersNode** head){
     int i;
     for(i = 0; i < room->clientsNum; i++){
         enqueBuffer(head, room->clientList.clients[i].socketDescriptor);
     }
 }
-void broadcast(chat_room* room, buffersNode* head){
+void broadcast(chat_room* room, buffersNode** head){
     int i;
     for(i = 0; i < room->clientsNum; i++){
         dequeBuffer(head, &(room->clientList));
