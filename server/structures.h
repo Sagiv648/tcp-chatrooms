@@ -43,8 +43,8 @@ typedef struct clientBuffersNode{
 
 } buffersNode;
 
-void enqueBuffer(buffersNode** head, int descriptor);
-void dequeBuffer(buffersNode** head, list* clList);
+void enqueBuffer(buffersNode*** head, int descriptor);
+void dequeBuffer(buffersNode*** head, list* clList);
 
 typedef void*(*roomRoutine)(void* args);
 

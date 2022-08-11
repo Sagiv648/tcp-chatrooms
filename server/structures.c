@@ -107,38 +107,48 @@ void listRemove(list* ls, client* cl){
 
 }
 
-void enqueBuffer(buffersNode** head, int descriptor){
+void enqueBuffer(buffersNode*** head, int descriptor){
 
     int len;
-    if(!(*head)){
-        *head = malloc(sizeof(buffersNode));
-        (*head)->next = NULL;
-        len = read(descriptor, (*head)->clBuffer, BUF_LEN);
-        (*head)->clBuffer[len] = 0;
-        (*head)->socketDescriptor = descriptor;
-        (*head)->bufSz = len+1;
+    if(!(**head)){
+        **head = malloc(sizeof(buffersNode));
+        (**head)->next = NULL;
+        //len = recvfrom(descriptor,(**head)->clBuffer, BUF_LEN-1,MSG_DONTWAIT, NULL,NULL);
+        len = read(descriptor, (**head)->clBuffer, BUF_LEN-1);
+        (**head)->clBuffer[len] = 0;
+        (**head)->socketDescriptor = descriptor;
+        (**head)->bufSz = len+1;
         return;
         
     }
-    buffersNode* tmp = *head;
-    for(;tmp->next != NULL;tmp = tmp->next);
-    tmp->next = malloc(sizeof(buffersNode));
-    tmp->next = NULL;
-    len = read(descriptor, tmp->clBuffer, BUF_LEN);
-    tmp->clBuffer[len] = 0;
-    tmp->socketDescriptor = descriptor;
+    buffersNode*** tmp = head;
+    for(;(**tmp)->next != NULL;**tmp = (**tmp)->next);
+    (**tmp)->next = malloc(sizeof(buffersNode));
+    **tmp = (**tmp)->next;
+    //len = recvfrom(descriptor,(**tmp)->clBuffer, BUF_LEN-1,MSG_DONTWAIT, NULL,NULL);
+    len = read(descriptor, (**tmp)->clBuffer, BUF_LEN);
+    
+    (**tmp)->clBuffer[len] = 0;
+    //printf("buffer is %s\n", (*tmp)->clBuffer);
+    (**tmp)->socketDescriptor = descriptor;
+    (**tmp)->next = NULL;
     
 }
-void dequeBuffer(buffersNode** head, list* clList){
+void dequeBuffer(buffersNode*** head, list* clList){
+    if(!(**head)){
+        printf("in deque -> head is null\n");
+        return;
+    }
     int i;
     for(i = 0; i < clList->length; i++){
-        if(clList->clients[i].socketDescriptor == (*head)->socketDescriptor){
+        if(clList->clients[i].socketDescriptor == (**head)->socketDescriptor){
             continue;
         }
-        write(clList->clients[i].socketDescriptor, (*head)->clBuffer,(*head)->bufSz);
+        write(clList->clients[i].socketDescriptor, (**head)->clBuffer,(**head)->bufSz);
 
     }
-    buffersNode* tmp = (*head)->next;
-    free(*head);
-    *head = tmp;
+    buffersNode*** tmp = head;
+    **tmp = (**tmp)->next;
+    free(**head);
+    **head = **tmp;
 }

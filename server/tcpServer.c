@@ -15,6 +15,7 @@ void* routine(void*args){
     
     chat_room* room = (chat_room*)args;
     buffersNode* head = NULL;
+    
     while(1){
         //Potentially having a linked list of user buffers will be better
         //The linked list will be initialized at the beginning of every iteration
@@ -28,11 +29,14 @@ void* routine(void*args){
             pthread_mutex_unlock(&(room->roomMtx));
         }
         recieve(room, &head);
-        broadcast(room, &head);
+        //broadcast(room, &head);
         //recieveBuffers
         //broadcastBuffers
         
-
+        for(;head; head = head->next){
+            printf("%s ", head->clBuffer);
+        }
+        printf("\n-----------\n");
         
         
 
@@ -85,9 +89,15 @@ int main(int argc, char** argv){
         printf("Name: %s, room number: %d, socket descriptor: %d\n",cl.Name,cl.roomNumber,cl.socketDescriptor);
 
         pthread_mutex_lock(&(rooms[cl.roomNumber-1].roomMtx));
+        if(rooms[cl.roomNumber-1].clientsNum == 0){
+            printf("signaling from main\n");
+            pthread_cond_signal(&(rooms[cl.roomNumber-1].roomCond_v));
+        }
         chatroomAdd(&(rooms[cl.roomNumber-1]),cl);
+        
         pthread_mutex_unlock(&(rooms[cl.roomNumber-1].roomMtx));
-        pthread_cond_signal(&(rooms[cl.roomNumber-1].roomCond_v));
+        
+        
         memset(buf,0,BUF_LEN);
         
         
