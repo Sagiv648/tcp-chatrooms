@@ -31,7 +31,7 @@ void* routine(void*args){
             pthread_mutex_unlock(&(room->roomMtx));
         }
         for(int i = 0; i < room->clientsNum; i++){
-            enqueBuffer(&head, room->clientList.clients[i].socketDescriptor);
+            enqueBuffer(&head, &(room->clientList.clients[i]));
         }
         
         // tmp = head;

@@ -6,7 +6,7 @@
 #include <pthread.h>
 
 
-#define BUF_LEN 51
+#define BUF_LEN 71
 
 #define MAX_ROOMS 2
 //Will be max 2 rooms(threads) for the debugging and test sessions
@@ -43,7 +43,7 @@ typedef struct clientBuffersNode{
 
 } buffersNode;
 
-void enqueBuffer(buffersNode** head, int descriptor);
+void enqueBuffer(buffersNode** head, client* descriptor);
 void dequeBuffer(buffersNode** head, list* clList);
 
 typedef void*(*roomRoutine)(void* args);

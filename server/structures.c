@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "utility.h"
 #include "structures.h"
+#include <errno.h>
 
 void initRooms(chat_room* rooms, roomRoutine routine){
 
@@ -107,21 +108,26 @@ void listRemove(list* ls, client* cl){
 
 }
 
-void enqueBuffer(buffersNode** head, int descriptor){
+
+//TODO:
+//1. Handle error handling with errno
+//2. Handle client-message-sender name before his actual message.
+void enqueBuffer(buffersNode** head, client* cl){
     char tempBuf[BUF_LEN];
     memset(tempBuf,0,sizeof(tempBuf));
     int len;
-    len = recvfrom(descriptor,tempBuf,BUF_LEN,MSG_DONTWAIT,NULL,NULL);
-    if(len <= 0){
+    len = recvfrom(cl->socketDescriptor,tempBuf,BUF_LEN,MSG_DONTWAIT,NULL,NULL);
+    if(len == 0){
         return;
     }
+    
 
     if(!(*head)){
         
         tempBuf[len] = 0;
         *head = malloc(sizeof(buffersNode));
         (*head)->next = NULL;
-        (*head)->socketDescriptor = descriptor;
+        (*head)->socketDescriptor = cl->socketDescriptor;
         strcpy((*head)->clBuffer,tempBuf);
         (*head)->bufSz = len;
         return;
@@ -133,7 +139,7 @@ void enqueBuffer(buffersNode** head, int descriptor){
     (tmp)->next = malloc(sizeof(buffersNode));
     tmp = (tmp)->next;
     strcpy((tmp)->clBuffer,tempBuf);
-    (tmp)->socketDescriptor = descriptor;
+    (tmp)->socketDescriptor = cl->socketDescriptor;
     (tmp)->bufSz = len;
     (tmp)->next = NULL;
     // int len;
@@ -166,10 +172,6 @@ void dequeBuffer(buffersNode** head, list* clList){
     if(!(*head)){
         return;
     }
-    // if(!(**head)){
-    //     printf("in deque -> head is null\n");
-    //     return;
-    // }
     int i;
     for(i = 0; i < clList->length; i++){
         if(clList->clients[i].socketDescriptor == (*head)->socketDescriptor){
