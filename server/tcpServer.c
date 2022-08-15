@@ -14,9 +14,11 @@ void* routine(void*args){
 
     
     chat_room* room = (chat_room*)args;
-    buffersNode* head = NULL;
-    
+    buffersNode* head;
+    buffersNode* tmp = head;
+    //memset(&head,0,sizeof(head));
     while(1){
+        head = NULL;
         //Potentially having a linked list of user buffers will be better
         //The linked list will be initialized at the beginning of every iteration
         if(room->clientsNum == 0){
@@ -28,15 +30,22 @@ void* routine(void*args){
             }
             pthread_mutex_unlock(&(room->roomMtx));
         }
-        recieve(room, &head);
-        //broadcast(room, &head);
-        //recieveBuffers
-        //broadcastBuffers
-        
-        for(;head; head = head->next){
-            printf("%s ", head->clBuffer);
+        for(int i = 0; i < room->clientsNum; i++){
+            enqueBuffer(&head, room->clientList.clients[i].socketDescriptor);
         }
-        printf("\n-----------\n");
+        
+        // tmp = head;
+        
+        
+        // for(;tmp; tmp = tmp->next){
+        //     printf("%s ", tmp->clBuffer);
+        //     if(!tmp->next){
+        //          printf("\n-----------\n");
+        //     }
+        // }
+        dequeBuffer(&head, &(room->clientList));
+        
+       
         
         
 
