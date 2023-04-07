@@ -1,2 +1,4 @@
 /.vscode
 info.env
+/openssl
+*.a
