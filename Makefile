@@ -1,16 +1,26 @@
-default:
-	gcc -pthread server/tcpServer.c -pthread server/utility.c -pthread server/structures.c -o server/tcpServer;
-	gcc -pthread client/tcpClients.c -pthread client/client_det.c -o client/tcpClients
+CXX		  := g++
+CXX_FLAGS := -Wall -Wextra -std=c++17 -ggdb
+
+BIN		:= bin
+SRC		:= src/*.cpp $(shell find $(lib) -name *.cpp)
+INCLUDE	:= -Iinclude -Ilib
+LIB		:= lib
+
+LIBRARIES	:= -lpthread \
+-lssl 
+EXECUTABLE	:= main
+
+
+all: $(BIN)/$(EXECUTABLE)
+
+run: clean all
 	
+	./$(BIN)/$(EXECUTABLE)
 
-tcpserver:
-	g++ -pthread server/main.cpp -pthread server/utils.cpp  -o server/main;
+$(BIN)/$(EXECUTABLE): $(SRC)
+	$(CXX) $(CXX_FLAGS) $(INCLUDE) -L$(LIB) $^ -o $@ $(LIBRARIES)
 
-tcpclient:
-	gcc -pthread client/tcpClients.c -pthread client/client_det.c -o client/tcpClients
+clean:
+	-rm $(BIN)/*
 
-execserver:
-	cd server && ./main
-	
-execclients:
-	cd client && ./tcpClients
+

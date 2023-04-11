@@ -1,4 +1,2 @@
 /.vscode
-info.env
-/openssl
-*.a
+/bin

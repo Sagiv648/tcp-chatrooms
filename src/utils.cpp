@@ -1,5 +1,5 @@
-#include "utils.hpp"
-
+#include "../include/utils.hpp"
+#include <iostream>
 
 int setupServer(sockaddr_in& addr)
 {
@@ -10,6 +10,14 @@ int setupServer(sockaddr_in& addr)
         perror("Cannot create socket");
         return -1;
     }
+    int option = SO_REUSEADDR;
+    int opt = setsockopt(socketFD,SOL_SOCKET ,SO_REUSEADDR,&option,sizeof(option));
+    if(opt == -1)
+    {
+        perror("Cannot set options to socket");
+        return -1;
+    }
+
     memset(&addr,0,sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(8080);
@@ -33,3 +41,5 @@ int setupServer(sockaddr_in& addr)
 
     return socketFD;
 }
+
+
